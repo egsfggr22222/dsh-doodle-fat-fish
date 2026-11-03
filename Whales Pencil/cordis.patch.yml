@@ -1,9 +1,0 @@
-# Whale's Pencil bundle patch.
-#
-# One insert mounts the Host half: the shared canvas document, the `pencil`
-# tool, the annotation compositor, and the desktop window with its tray icon.
-# The browser half only carries the settings page.
-- insert:
-    - id: whale-pencil
-      name: 'whale-pencil'
-      config: {}
