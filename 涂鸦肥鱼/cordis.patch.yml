@@ -1,0 +1,14 @@
+# DSH 涂鸦肥鱼 (DSH Doodle Fat Fish) bundle patch.
+#
+# One insert mounts the whole Host half: the capture engine, the annotation
+# renderer, the desktop board, the whale, and the dependency installer.
+#
+# WARNING: `id` and `name` must match package.json's `name` exactly. DSH validates
+# that a plugin's own resources (icon, skills) live inside a package whose
+# package.json name equals the installed identity; a mismatch fails with
+# "icon must remain inside its package directory" and the settings panel
+# disappears. Change both files together, never one.
+- insert:
+    - id: dsh-doodle-fat-fish
+      name: 'dsh-doodle-fat-fish'
+      config: {}

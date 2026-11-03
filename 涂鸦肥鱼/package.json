@@ -1,0 +1,60 @@
+{
+  "name": "dsh-doodle-fat-fish",
+  "displayName": "DSH 涂鸦肥鱼",
+  "version": "1.0.0",
+  "description": "DSH 涂鸦肥鱼 —— 看图、标注、桌面画板三合一。截图 → 标注 → 收尾，中间图任务结束即删，只有标好的结果留在历史里。首次使用需在面板里下载依赖。",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "icon.svg",
+    "cordis.patch.yml",
+    "skills/",
+    "tools/",
+    "ball/",
+    "README.md",
+    "LICENSE",
+    "THIRD-PARTY-NOTICES.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": []
+    }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/egsfggr22222/dsh-doodle-fat-fish.git"
+  },
+  "homepage": "https://github.com/egsfggr22222/dsh-doodle-fat-fish#readme",
+  "bugs": {
+    "url": "https://github.com/egsfggr22222/dsh-doodle-fat-fish/issues"
+  },
+  "author": "egsfggr22222",
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "doodle",
+    "涂鸦肥鱼",
+    "screenshot",
+    "annotation",
+    "drawing",
+    "ocr",
+    "desktop-pet"
+  ]
+}
