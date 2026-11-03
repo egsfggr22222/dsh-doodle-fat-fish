@@ -1,40 +1,44 @@
 # Whale's Pencil
 
-[中文 README](https://github.com/egsfggr22222/Whales-Pencil-/blob/main/Whales%20Pencil/README.md)
+[中文 README](https://github.com/egsfggr22222/dsh-doodle-fat-fish/blob/main/%E6%B6%82%E9%B8%A6%E8%82%A5%E9%B1%BC/README.md)
 
-A transparent canvas that **covers the entire desktop**. The agent can draw in any color, and you can draw with a red pencil picked up from the floating ball — **either side can erase what the other has drawn**, so you can communicate by "pointing at things."
+A transparent canvas that **covers the entire desktop**. The agent can draw in any colour, and you draw with a pencil picked up from the floating whale — **either side can erase what the other has drawn**, so you can talk to each other by pointing at things.
 
-It is not drawn inside the DSH window: the canvas is a full-screen window on the desktop, and DSH sits beneath it.
+Nothing is drawn inside the DSH window: the canvas is a full-screen window on the desktop, and DSH sits beneath it.
 
-## Four Interface Elements
+---
+
+## Four interface elements
 
 | Element | What it is | When it appears |
 |---|---|---|
-| **Floating ball** | A 52×52 red-and-black ball. Double-click to open the canvas, right-click for the menu | Always on screen, draggable anywhere |
-| **Canvas** | A full-screen transparent layer for drawing, writing, erasing | Double-click the ball to enter, `Esc` to leave |
+| **Floating whale** | A 52×52 desk pet. Double-click to open the canvas, right-click for the menu | Always on screen, draggable anywhere |
+| **Canvas** | A full-screen transparent layer for drawing, writing and erasing | Enter by double-clicking the whale, `Esc` to leave |
 | **Dynamic island** | A status capsule at the top centre of the screen | Appears while the agent works, disappears when it finishes |
-| **Menus** | 2 items on the ball, 4 on the canvas | Right-click |
+| **Menus** | 2 items on the whale, 4 on the canvas | Right-click |
 
-## The Floating Ball
+## The floating whale
 
-**Double left-click** → open the canvas (the ball hides)
-**Single left-click** → nothing (guards against accidents)
-**Drag** → move it anywhere; native OS dragging, fully responsive
-**Right-click** → menu: `Summon agent` / `Clear all`
+- **Double left-click** → open the canvas (the whale hides)
+- **Single left-click** → nothing, which guards against accidents
+- **Drag** → move it anywhere; native OS dragging, fully responsive
+- **Right-click** → `Summon agent` / `Clear all`
 
-The ball can be dragged to a screen edge and will hang off it, but never further than 16 px — it cannot be dragged out of reach.
+The whale can be dragged to a screen edge and will hang off it, but never further than 16 px — it cannot be dragged out of reach.
 
-> The ball is a **separate window**, not painted on the canvas. The canvas is click-through while idle, so anything painted on it could not be clicked.
+> The whale is a **separate window**, not painted on the canvas. The canvas is click-through while idle, so anything painted on it could not be clicked.
 
-## Canvas Controls
+## Canvas controls
 
 | Action | Effect |
 |---|---|
-| **Left-drag** | Draw a red line |
-| **Shift + left-click** | Eraser (erases strokes and text under the cursor) |
-| **Right-click** | Open the menu (**does not erase**) |
-| **Scroll wheel** | Adjust thickness (1–30 px), with the width shown next to the cursor |
-| **Esc** | Leave the canvas; the ball returns |
+| **Left-drag** | Draw |
+| **Shift + left-click** | Eraser — clears the pixels under the cursor |
+| **Alt + left-drag** | Select text (drag to highlight, `Ctrl+C` to copy) |
+| **Double-tap CapsLock** | Switch the pen between black and white |
+| **Right-click** | Open the menu — **does not erase** |
+| **Scroll wheel** | Adjust thickness (1–300 px), with the width shown beside the cursor |
+| **Esc** | Leave the canvas; the whale returns |
 
 Canvas menu (4 items):
 
@@ -49,21 +53,22 @@ Exit drawing
 
 **"Text box" opens its input at the right-click position**, not in a fixed corner.
 
-## Text Is a Copyable Container
+## Text is a copyable container
 
-Text is not a picture; it is a real text container. **The user's text and the agent's text behave identically**:
+Text is not a picture — it is a real text container. **Your text and the agent's text behave identically:**
 
 | Action | Effect |
 |---|---|
-| Hover | Cursor becomes an I-beam |
-| Drag | **Selects character by character** |
-| Double-click | Selects a word |
+| Leave draw mode, hold `Alt` | Cursor becomes an I-beam over the words |
+| Drag | Selects character by character |
 | `Ctrl + A` | Select all |
 | **`Ctrl + C`** | **Copies to the system clipboard** |
 
-The boxes are read-only `TextBox` controls, so selection and copying are native Windows behaviour.
+The boxes are read-only, so selection and copying are native behaviour, and typing into them does nothing.
 
-## Entering Text
+The backing of a committed box is transparent while the glyphs stay fully opaque — words written directly on the desktop, with no frame around them.
+
+## Entering text
 
 Right-click → "Text box" → an input appears where you clicked:
 
@@ -71,9 +76,9 @@ Right-click → "Text box" → an input appears where you clicked:
 - **Click outside the box** → commit
 - **Esc** → cancel
 
-On commit it becomes a red text label and is written to `user.json` for the agent to read.
+On commit it becomes a text label and is written to `user.json` for the agent to read.
 
-## Dynamic Island
+## Dynamic island
 
 A translucent capsule at the **top centre of the screen** showing what the agent is doing:
 
@@ -84,13 +89,13 @@ A translucent capsule at the **top centre of the screen** showing what the agent
 | Calling a tool | `Calling pencil 12s` | Green |
 | Idle | **Disappears entirely** | — |
 
-**A red stop button sits on its right** → clicking it aborts the agent's task and the island vanishes immediately.
+**A stop button sits on its right** — clicking it aborts the agent's task and the island vanishes immediately.
 
 The island is a **separate window** so it can be clicked (the canvas itself is click-through).
 
-## Summoning the Agent
+## Summoning the agent
 
-Right-click the ball (or the canvas menu) → "Summon agent":
+Right-click the whale (or the canvas menu) → "Summon agent":
 
 1. The window **captures a full-screen screenshot** and delivers it to the model through the attachment service
 2. It also writes `summon.json`
@@ -99,10 +104,10 @@ Right-click the ball (or the canvas menu) → "Summon agent":
 
 The delivery result is written to `summon-ack.json`; success is `{"ok":true}`, failure carries an `error` — nothing is silent.
 
-## Agent Drawing
+## Agent drawing
 
 ```
-pencil { action: "draw",  items: [...] }        // any color
+pencil { action: "draw",  items: [...] }        // any colour
 pencil { action: "erase", ids: ["a3-1"] }       // name precisely
 pencil { action: "erase", rects: [{...}] }      // by region
 pencil { action: "scene" }                      // see what's on the canvas
@@ -114,7 +119,7 @@ Primitives: `rect / ellipse / path / arrow / text / image / pixels`. Coordinates
 
 **The agent cannot clear everything at once** — wiping the whole canvas would overturn the user's work, and only the user may do that. If the agent wants to remove its own things, it uses `erase` to name them precisely.
 
-## Image Annotation
+## Image annotation
 
 ```
 pencil { action: "annotate", source: "original.png", items: [{type:"arrow", ...}] }
@@ -123,19 +128,19 @@ pencil { action: "annotate", source: "original.png", items: [{type:"arrow", ...}
 
 The original is untouched; the result is saved separately. All output goes into the `Processed image` folder.
 
-## Why It's Designed This Way
+## Why it is designed this way
 
-### Three Separate Windows
+### Three separate windows
 
 | Window | Purpose | Clicks |
 |---|---|---|
 | Canvas | Drawing | Only while drawing; click-through otherwise |
-| Floating ball | Entry point | Always |
+| Floating whale | Entry point | Always |
 | Dynamic island | Status | Always (stop button) |
 
-**They must be separate.** The canvas is `WS_EX_TRANSPARENT` (click-through) while idle, so a button painted on it could never be clicked. This is a trap that was hit three times.
+**They must be separate.** The canvas is click-through while idle, so a button painted on it could never be clicked.
 
-### File Channels
+### File channels
 
 The two processes communicate through files, one writer per file:
 
@@ -152,29 +157,31 @@ The two processes communicate through files, one writer per file:
 
 ### Heartbeat
 
-The window checks `alive.txt` every second and **closes itself** if it hasn't been updated for more than 6 seconds — so if the host crashes, it won't leave an always-on-top transparent window on the desktop.
+The window checks `alive.txt` every second and **closes itself** if it has not been updated for more than 6 seconds — so if the Host crashes, it will not leave an always-on-top transparent window on the desktop.
 
-## Five Pitfalls You Must Remember
+## Five pitfalls worth remembering
 
-**1. You must launch with `cmd /c start`**
+These were all hit during development; each one costs an afternoon if you meet it fresh.
 
-Spawning `powershell.exe` directly makes the WPF window share the host's window station, and it **exits instantly with no error**.
+**1. `WS_EX_TRANSPARENT` makes a window unhittable, not merely invisible**
 
-**2. High-DPI scaling must be converted**
+A click-through window cannot be clicked, dragged over, or selected from — at all. Anything that needs the mouse (a text box, a button) must be a **separate window**, and "inert" should be expressed as opacity or a colour key instead.
 
-WPF uses device-independent units. At 125% scaling, drawing directly in physical pixels comes out 25% too large.
+**2. A colour key and a layered surface are mutually exclusive**
 
-**3. `pencil.ps1` must be pure ASCII**
+`-transparentcolor` installs a colour key; `UpdateLayeredWindow` installs per-pixel alpha. Both on the same window means one of them silently stops working. Pick one per window.
 
-Windows PowerShell 5.1 reads BOM-less `.ps1` files using the ANSI code page. Chinese labels go through `labels.json`.
+**3. High-DPI scaling must be converted**
 
-**4. PowerShell comments must not contain backticks**
+At 125% scaling, drawing directly in physical pixels comes out 25% too large. The window works in its own logical units and converts once at the boundary.
 
-A backtick is an escape character; inside a comment it still breaks parsing, and the reported error points somewhere far away.
+**4. `ctypes` needs explicit `argtypes` for 64-bit handles**
+
+Without them, handles are truncated to 32 bits and become negative. Mask every handle to the low 32 bits before use.
 
 **5. A borderless window cannot be dragged with `DragMove()`**
 
-`DragMove()` needs a caption or a resize frame. A `WindowStyle = 'None'` window has neither, so it **fails silently**. Use `ReleaseCapture()` + `SendMessage(WM_SYSCOMMAND, SC_MOVE)` instead.
+`DragMove()` needs a caption or a resize frame. A frameless window has neither, so it **fails silently**. Use `ReleaseCapture()` + `SendMessage(WM_SYSCOMMAND, SC_MOVE)` instead.
 
 ## Structure
 
@@ -182,17 +189,21 @@ A backtick is an escape character; inside a comment it still breaks parsing, and
 |---|---|
 | `index.js` | Host: scene, `pencil` tool, routing, window lifecycle, dynamic-island state |
 | `client.js` | Browser: settings page |
-| `pencil.ps1` | Desktop window: canvas + floating ball + dynamic island |
-| `annotate.ps1` | Image composition |
-| `locate.ps1` | Locate the plugin directory |
-| `skills/` | The `pencil-board` and `pencil-summon` skill documents |
+| `tools/board.py` | Desktop window: canvas + floating whale + dynamic island |
+| `tools/island.py` | The status capsule, as its own process |
+| `ball/deskpet.py` | The whale desk pet |
+| `tools/annotate.py` | Image composition |
+| `tools/capture.py` | Screen, window and desktop capture |
+| `tools/*.py` | Detection: OCR, UI elements, objects, layout |
+| `skills/` | The skill documents the agent reads |
 
 State directory: `~/.dsh/whale-pencil/`
 
-## Known Limitations
+## Known limitations
 
 - Only runs on **Windows**.
 - Drawing mode catches the mouse across the entire desktop (necessary to draw at all).
-- The user only has red; changing colors requires the agent to draw.
+- The user's pen has two colours, black and white (double-tap CapsLock); the agent can draw in any colour.
 - Multi-monitor setups span the virtual screen, but the coordinate origin is the top-left of the primary monitor.
 - Text selection is driven manually by the board (because the canvas owns the mouse). It is character-accurate but not a full text box: no drag-and-drop, no context menu.
+- The first run downloads roughly 2.6 GB of runtime and models; see the dependencies page in the settings panel.
