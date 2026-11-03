@@ -1,209 +1,152 @@
-# Whale's Pencil
+# DSH Doodle Fat Fish
 
-[中文 README](https://github.com/egsfggr22222/dsh-doodle-fat-fish/blob/main/%E6%B6%82%E9%B8%A6%E8%82%A5%E9%B1%BC/README.md)
+> Screenshot, annotate, and draw on your desktop — all in one plugin.
+> Working images are deleted when a task ends; only finished marks stay in history.
 
-A transparent canvas that **covers the entire desktop**. The agent can draw in any colour, and you draw with a pencil picked up from the floating whale — **either side can erase what the other has drawn**, so you can talk to each other by pointing at things.
-
-Nothing is drawn inside the DSH window: the canvas is a full-screen window on the desktop, and DSH sits beneath it.
+[中文readme](https://github.com/egsfggr22222/dsh-doodle-fat-fish/blob/main/%E6%B6%82%E9%B8%A6%E8%82%A5%E9%B1%BC/README.md)
 
 ---
 
-## Four interface elements
+## What it is
 
-| Element | What it is | When it appears |
+A DSH plugin that packs three things into one package:
+
+- **Look** — capture the screen, a single window, or the picture the user sent
+- **Mark** — find text with OCR, find controls with UI detection, find objects with YOLO, then circle them on the image
+- **Draw** — paint directly on the desktop, with the pen following the mouse
+
+Once installed, you can simply tell the agent "circle that button on the screen" and it will capture, locate, annotate, and paste the result back into the conversation.
+
+## Install
+
+### From npm (recommended)
+
+```bash
+npm install dsh-doodle-fat-fish
+```
+
+Or search for `dsh-doodle-fat-fish` in the DSH plugin panel.
+
+### From GitHub
+
+```bash
+npm install github:egsfggr22222/dsh-doodle-fat-fish
+```
+
+### Two more steps after installing
+
+**Step one: download the dependencies**
+
+The plugin itself is only about 600 KB of hand-written code. Actually doing the work needs a Python environment and detection models, roughly **2.6 GB** in total, which does not belong inside the package. So:
+
+1. Open **Settings → DSH Doodle Fat Fish → Dependencies**
+2. Press **Download**
+
+Downloads **support pause and resume**: an interrupted run continues from the item it stopped on, and finished items are never downloaded again.
+
+**Step two: restart DSH**
+
+The environment needs one restart to take effect.
+
+## Dependency list
+
+| Part | Contents | Size |
 |---|---|---|
-| **Floating whale** | A 52×52 desk pet. Double-click to open the canvas, right-click for the menu | Always on screen, draggable anywhere |
-| **Canvas** | A full-screen transparent layer for drawing, writing and erasing | Enter by double-clicking the whale, `Esc` to leave |
-| **Dynamic island** | A status capsule at the top centre of the screen | Appears while the agent works, disappears when it finishes |
-| **Menus** | 2 items on the whale, 4 on the canvas | Right-click |
+| Python environment | `ocr_env/` (created automatically) | ~920 MB |
+| Object detection | `yoloe-11s-seg.pt` + `mobileclip_blt.ts` | ~600 MB |
+| UI detection | `omniparser_icon_detect.pt` | ~39 MB |
+| Layout detection | `yolov8s-worldv2.pt` | ~55 MB |
+| Optional | GroundingDINO, CLIP | ~1 GB |
 
-## The floating whale
+Download channels switch automatically by availability: pip goes Tsinghua → Aliyun → official; weights go Hugging Face → hf-mirror.
 
-- **Double left-click** → open the canvas (the whale hides)
-- **Single left-click** → nothing, which guards against accidents
-- **Drag** → move it anywhere; native OS dragging, fully responsive
-- **Right-click** → `Summon agent` / `Clear all`
+## Tools
 
-The whale can be dragged to a screen edge and will hang off it, but never further than 16 px — it cannot be dragged out of reach.
+| Tool | Purpose |
+|---|---|
+| `look` | Screen / window / desktop capture |
+| `now-image` | Take the picture the user sent |
+| `find` | Find things in a picture (OCR + UI + objects) |
+| `mark` | Annotate on an image |
+| `finish` | Wrap up: archive the result, clean the working copies |
+| `pencil` | Draw on the desktop screen |
+| `history` | Browse past results |
 
-> The whale is a **separate window**, not painted on the canvas. The canvas is click-through while idle, so anything painted on it could not be clicked.
-
-## Canvas controls
+## Desktop board gestures
 
 | Action | Effect |
 |---|---|
-| **Left-drag** | Draw |
-| **Shift + left-click** | Eraser — clears the pixels under the cursor |
-| **Alt + left-drag** | Select text (drag to highlight, `Ctrl+C` to copy) |
+| Left-drag | Draw |
+| **Shift + left-click** | Erase |
+| **Alt + left-drag** | Select text |
 | **Double-tap CapsLock** | Switch the pen between black and white |
-| **Right-click** | Open the menu — **does not erase** |
-| **Scroll wheel** | Adjust thickness (1–300 px), with the width shown beside the cursor |
-| **Esc** | Leave the canvas; the whale returns |
+| Scroll wheel | Adjust pen width |
 
-Canvas menu (4 items):
+A text box has a **transparent backing while the glyphs stay fully opaque** — as if written directly on the desktop.
+
+## Directory structure
 
 ```
-Text box
-─────────
-Summon agent
-Clear all
-─────────
-Exit drawing
+index.js          Host half: tool registration, routes, board/whale/island management
+client.js         Client half: settings panel (history / capture / board / dependencies)
+tools-host.js     The find tool implementation
+tools/            All Python implementations
+  board.py          Desktop board
+  island.py         Dynamic island (separate process)
+  install_deps.py   Dependency downloader
+  mark.py           Annotation rendering
+  act.py            Capture in one call
+ball/             Whale desk pet (deskpet.py + server.py)
+skills/           Skill documents for the agent
 ```
 
-**"Text box" opens its input at the right-click position**, not in a fixed corner.
+## Development
 
-## Text is a copyable container
+```bash
+git clone https://github.com/egsfggr22222/dsh-doodle-fat-fish.git
+cd dsh-doodle-fat-fish
+```
 
-Text is not a picture — it is a real text container. **Your text and the agent's text behave identically:**
+Point at the local directory with `link:` in `~/.dsh/profiles/desktop/package.json`:
 
-| Action | Effect |
-|---|---|
-| Leave draw mode, hold `Alt` | Cursor becomes an I-beam over the words |
-| Drag | Selects character by character |
-| `Ctrl + A` | Select all |
-| **`Ctrl + C`** | **Copies to the system clipboard** |
+```json
+"dependencies": {
+  "dsh-doodle-fat-fish": "link:C:/path/to/dsh-doodle-fat-fish"
+}
+```
 
-The boxes are read-only, so selection and copying are native behaviour, and typing into them does nothing.
+Then add `"dsh-doodle-fat-fish"` to the `dsh.profile.bundles` array in the same file, and restart DSH.
 
-The backing of a committed box is transparent while the glyphs stay fully opaque — words written directly on the desktop, with no frame around them.
+## Notes
 
-## Entering text
+- **The package name must match everywhere**: `package.json`'s `name`, and `cordis.patch.yml`'s `id`/`name`, must all be exactly the same, otherwise DSH reports `icon must remain inside its package directory` and the whole settings panel disappears.
+- **`.npmignore` is required**: the `files` field in `package.json` includes `tools/` and `ball/`, and `files` overrides `.gitignore`. Without `.npmignore`, `npm pack` would bundle the 3.7 GB of weights and the environment.
 
-Right-click → "Text box" → an input appears where you clicked:
+## Third-party code and assets
 
-- **Enter** → new line (genuinely multi-line)
-- **Click outside the box** → commit
-- **Esc** → cancel
+The desktop whale (`ball/`) comes from other open-source projects:
 
-On commit it becomes a text label and is written to `user.json` for the agent to read.
+```
+Yifffan/dsh-plugin-whale-pet 0.2.9   (original project)
+        ↓ fork
+rongzi5/dsh-whale-pet                (the version taken here)
+        ↓ modified
+DSH Doodle Fat Fish / dsh-doodle-fat-fish   (this project)
+```
 
-## Dynamic island
-
-A translucent capsule at the **top centre of the screen** showing what the agent is doing:
-
-| State | Shows | Dot colour |
+| Contents | Licence | Requirement |
 |---|---|---|
-| Thinking | `Thinking 5s` | Grey-blue |
-| Reading | `Reading eye 3s` | Cyan |
-| Calling a tool | `Calling pencil 12s` | Green |
-| Idle | **Disappears entirely** | — |
+| `ball/deskpet.py`, `ball/server.py` | **MIT** | Keep the copyright notice |
+| `ball/whale.ico`, artwork in `ball/dist/` | **CC BY 4.0** | Attribution + licence link + statement of changes |
 
-**A stop button sits on its right** — clicking it aborts the agent's task and the island vanishes immediately.
+**Changes made**: the whale code was wired into this plugin's state channel, its single-instance guard was changed to a lock file, and the state directory now arrives as a parameter.
+The artwork is unmodified.
 
-The island is a **separate window** so it can be clicked (the canvas itself is click-through).
+See [THIRD-PARTY-NOTICES.md](./THIRD-PARTY-NOTICES.md) for the full statement.
 
-## Summoning the agent
+> ⚠ **AGPL note**: Ultralytics YOLO, among the optional dependencies, is licensed AGPL-3.0. If that licence does not suit you,
+> do not download `yoloe-11s-seg.pt` (OCR and UI detection do not depend on it).
 
-Right-click the whale (or the canvas menu) → "Summon agent":
+## Licence
 
-1. The window **captures a full-screen screenshot** and delivers it to the model through the attachment service
-2. It also writes `summon.json`
-3. When the Host reads it, it delivers a prompt into **the session that most recently used the pencil**
-4. The agent wakes up with the screenshot attached
-
-The delivery result is written to `summon-ack.json`; success is `{"ok":true}`, failure carries an `error` — nothing is silent.
-
-## Agent drawing
-
-```
-pencil { action: "draw",  items: [...] }        // any colour
-pencil { action: "erase", ids: ["a3-1"] }       // name precisely
-pencil { action: "erase", rects: [{...}] }      // by region
-pencil { action: "scene" }                      // see what's on the canvas
-pencil { action: "annotate", source: "img.png", items: [...] }
-pencil { action: "overlay", overlay: "start" }
-```
-
-Primitives: `rect / ellipse / path / arrow / text / image / pixels`. Coordinates default to **desktop physical pixels**, with `(0,0)` at the top-left of the screen; `unit: "window"` uses screen percentages.
-
-**The agent cannot clear everything at once** — wiping the whole canvas would overturn the user's work, and only the user may do that. If the agent wants to remove its own things, it uses `erase` to name them precisely.
-
-## Image annotation
-
-```
-pencil { action: "annotate", source: "original.png", items: [{type:"arrow", ...}] }
-→ writes Processed image/original-pencil-20261019135723.png
-```
-
-The original is untouched; the result is saved separately. All output goes into the `Processed image` folder.
-
-## Why it is designed this way
-
-### Three separate windows
-
-| Window | Purpose | Clicks |
-|---|---|---|
-| Canvas | Drawing | Only while drawing; click-through otherwise |
-| Floating whale | Entry point | Always |
-| Dynamic island | Status | Always (stop button) |
-
-**They must be separate.** The canvas is click-through while idle, so a button painted on it could never be clicked.
-
-### File channels
-
-The two processes communicate through files, one writer per file:
-
-| File | Writer | Reader |
-|---|---|---|
-| `scene.json` | Host (agent) | window |
-| `user.json` | window (user) | Host |
-| `commands.json` | Host | window |
-| `clear.txt` | window | Host |
-| `stop.txt` | window (stop button) | Host |
-| `status.json` | Host | window (dynamic island) |
-
-**Why the stop button uses a file instead of HTTP**: the DSH web service only admits requests carrying a live session. The board window is a separate process with no session, so an HTTP request comes back 401.
-
-### Heartbeat
-
-The window checks `alive.txt` every second and **closes itself** if it has not been updated for more than 6 seconds — so if the Host crashes, it will not leave an always-on-top transparent window on the desktop.
-
-## Five pitfalls worth remembering
-
-These were all hit during development; each one costs an afternoon if you meet it fresh.
-
-**1. `WS_EX_TRANSPARENT` makes a window unhittable, not merely invisible**
-
-A click-through window cannot be clicked, dragged over, or selected from — at all. Anything that needs the mouse (a text box, a button) must be a **separate window**, and "inert" should be expressed as opacity or a colour key instead.
-
-**2. A colour key and a layered surface are mutually exclusive**
-
-`-transparentcolor` installs a colour key; `UpdateLayeredWindow` installs per-pixel alpha. Both on the same window means one of them silently stops working. Pick one per window.
-
-**3. High-DPI scaling must be converted**
-
-At 125% scaling, drawing directly in physical pixels comes out 25% too large. The window works in its own logical units and converts once at the boundary.
-
-**4. `ctypes` needs explicit `argtypes` for 64-bit handles**
-
-Without them, handles are truncated to 32 bits and become negative. Mask every handle to the low 32 bits before use.
-
-**5. A borderless window cannot be dragged with `DragMove()`**
-
-`DragMove()` needs a caption or a resize frame. A frameless window has neither, so it **fails silently**. Use `ReleaseCapture()` + `SendMessage(WM_SYSCOMMAND, SC_MOVE)` instead.
-
-## Structure
-
-| File | Role |
-|---|---|
-| `index.js` | Host: scene, `pencil` tool, routing, window lifecycle, dynamic-island state |
-| `client.js` | Browser: settings page |
-| `tools/board.py` | Desktop window: canvas + floating whale + dynamic island |
-| `tools/island.py` | The status capsule, as its own process |
-| `ball/deskpet.py` | The whale desk pet |
-| `tools/annotate.py` | Image composition |
-| `tools/capture.py` | Screen, window and desktop capture |
-| `tools/*.py` | Detection: OCR, UI elements, objects, layout |
-| `skills/` | The skill documents the agent reads |
-
-State directory: `~/.dsh/whale-pencil/`
-
-## Known limitations
-
-- Only runs on **Windows**.
-- Drawing mode catches the mouse across the entire desktop (necessary to draw at all).
-- The user's pen has two colours, black and white (double-tap CapsLock); the agent can draw in any colour.
-- Multi-monitor setups span the virtual screen, but the coordinate origin is the top-left of the primary monitor.
-- Text selection is driven manually by the board (because the canvas owns the mouse). It is character-accurate but not a full text box: no drag-and-drop, no context menu.
-- The first run downloads roughly 2.6 GB of runtime and models; see the dependencies page in the settings panel.
+The original parts of this project are MIT — see [LICENSE](./LICENSE).
